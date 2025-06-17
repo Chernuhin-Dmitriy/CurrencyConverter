@@ -103,4 +103,81 @@ class CurrenciesViewModel @Inject constructor(
                     val sortedRates = rates.sortedWith { a, b ->
                         when {
                             a.currencyCode == _uiState.value.selectedCurrency -> -1
-                            b.currencyCode == _uiState
+                            b.currencyCode == _uiState.value.selectedCurrency -> 1
+                            else -> a.currencyCode.compareTo(b.currencyCode)
+                        }
+                    }
+
+                    _uiState.value = _uiState.value.copy(
+                        rates = sortedRates,
+                        isLoading = false
+                    )
+                } catch (e: Exception) {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMessage = e.message
+                    )
+                }
+                delay(1000) // Обновляем каждую секунду согласно ТЗ
+            }
+        }
+    }
+
+    private fun loadFilteredRates(desiredAmount: Double) {
+        ratesUpdateJob?.cancel()
+        ratesUpdateJob = viewModelScope.launch {
+            while (true) {
+                try {
+                    val rates = getFilteredRatesUseCase(
+                        _uiState.value.selectedCurrency,
+                        desiredAmount
+                    )
+
+                    // Сортируем: выбранная валюта первая, остальные по алфавиту
+                    val sortedRates = rates.sortedWith { a, b ->
+                        when {
+                            a.currencyCode == _uiState.value.selectedCurrency -> -1
+                            b.currencyCode == _uiState.value.selectedCurrency -> 1
+                            else -> a.currencyCode.compareTo(b.currencyCode)
+                        }
+                    }
+
+                    _uiState.value = _uiState.value.copy(
+                        rates = sortedRates,
+                        isLoading = false
+                    )
+                } catch (e: Exception) {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMessage = e.message
+                    )
+                }
+                delay(1000)
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        ratesUpdateJob?.cancel()
+    }
+}
+
+data class CurrenciesUiState(
+    val selectedCurrency: String = "RUB",
+    val inputAmount: String = "",
+    val rates: List<Rate> = emptyList(),
+    val isLoading: Boolean = true,
+    val errorMessage: String? = null,
+    val navigationEvent: NavigationEvent? = null
+)
+
+sealed class NavigationEvent {
+    data class ToExchange(
+        val fromCurrency: String,
+        val toCurrency: String,
+        val fromAmount: Double,
+        val toAmount: Double,
+        val exchangeRate: Double
+    ) : NavigationEvent()
+}
