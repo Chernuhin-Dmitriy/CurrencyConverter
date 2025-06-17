@@ -1,4 +1,29 @@
 <resources>
+    <!-- Navigation -->
+    <string name="nav_currencies" translatable="false">Валюты</string>
+    <string name="nav_exchange" translatable="false">Обмен</string>
+    <string name="nav_transactions" translatable="false">Транзакции</string>
+
+    <!-- Currencies Screen -->
+    <string name="clear_amount" translatable="false">Очистить сумму</string>
+    <string name="balance" translatable="false">Баланс: %s</string>
+    <string name="loading" translatable="false">Загрузка...</string>
+    <string name="error_loading_rates" translatable="false">Ошибка загрузки курсов</string>
+
+    <!-- Exchange Screen -->
+    <string name="from_currency" translatable="false">Из валюты:</string>
+    <string name="to_currency" translatable="false">В валюту:</string>
+    <string name="exchange_rate" translatable="false">Курс обмена:</string>
+    <string name="buy_button" translatable="false">Купить</string>
+    <string name="exchange_success" translatable="false">Обмен выполнен успешно</string>
+    <string name="exchange_error" translatable="false">Ошибка при обмене</string>
+
+    <!-- Transactions Screen -->
+    <string name="no_transactions" translatable="false">Нет транзакций</string>
+    <string name="transaction_format" translatable="false">%1$s → %2$s</string>
+    <string name="amount_format" translatable="false">%1$s %2$s → %3$s %4$s</string>
+
+
     <string name="app_name" translatable="false">CurrencyConverter</string>
 
     <string name="symbol_eur" translatable="false">€</string>
