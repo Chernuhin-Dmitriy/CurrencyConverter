@@ -188,4 +188,8 @@ object CurrencyUtils {
             String.format("%.2f", amount)
         }
     }
+
+    fun getCurrencyFlag(currencyCode: String): String {
+        return CurrencyFlags.getFlagEmoji(currencyCode)
+    }
 }

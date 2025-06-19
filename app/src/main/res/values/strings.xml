@@ -1,4 +1,16 @@
 <resources>
+    <?xml version="1.0" encoding="utf-8"?>
+    <resources>
+        <string name="app_name">Currency Converter</string>
+
+        <!-- UI Strings -->
+        <string name="currencies_title">Валюты</string>
+        <string name="exchange_title">Обмен</string>
+        <string name="transactions_title">Транзакции</string>
+        <string name="enter_amount">Введите сумму</string>
+        <string name="insufficient_funds">Недостаточно средств</string>
+    </resources>
+
     <!-- Navigation -->
     <string name="nav_currencies" translatable="false">Валюты</string>
     <string name="nav_exchange" translatable="false">Обмен</string>
@@ -24,7 +36,6 @@
     <string name="amount_format" translatable="false">%1$s %2$s → %3$s %4$s</string>
 
 
-    <string name="app_name" translatable="false">CurrencyConverter</string>
 
     <string name="symbol_eur" translatable="false">€</string>
     <string name="symbol_aud" translatable="false">$</string>

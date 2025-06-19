@@ -195,7 +195,7 @@ private fun TransactionItem(
             val exchangeRate = transaction.toAmount / transaction.fromAmount
             Text(
                 text = stringResource(
-                    R.string.transaction_rate,
+                    R.string.transaction_format,//transaction_rate,
                     transaction.fromCurrency,
                     CurrencyUtils.formatAmount(exchangeRate),
                     transaction.toCurrency
