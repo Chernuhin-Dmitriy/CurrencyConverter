@@ -1,33 +1,36 @@
 [versions]
-agp = "8.7.2"
-kotlin = "2.0.0"
+agp = "8.10.1"
+kotlin = "2.0.21"  # Стабильная версия 2.0.x
 coreKtx = "1.16.0"
-junit = "4.14-SNAPSHOT"
+junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.9.0"
+lifecycleRuntimeKtx = "2.9.1"
 activityCompose = "1.10.1"
-composeBom = "2024.04.01"
+composeBom = "2025.06.01"
 retrofit = "2.11.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
 xmlUtil = "0.91.0"
 room = "2.6.1"
-hilt-version = "2.49"
-ksp-version = "2.0.0-1.0.24"
+hilt-version = "2.52"  # Обновили с 2.49
+ksp-version = "2.0.21-1.0.28"  # Совместимая с Kotlin 2.0.21
 coilVersion = "1.4.0"
-recyclerviewVersion = "1.2.1"
-navigationUiKtx = "2.8.7"
+recyclerviewVersion = "1.4.0"
+navigationUiKtx = "2.9.0"
 kotlinxCoroutines = "1.9.0"
-appcompat = "1.7.0"
+appcompat = "1.7.1"
 material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
 testng = "6.9.6"
-junitJunit = "4.12"
-hilt-navigation-compose = "1.2.0"  # Актуальная версия на момент ответа
-lifecycle-compose = "2.9.1"        # Для collectAsStateWithLifecycle
+junitJunit = "4.13.2"
+hilt-navigation-compose = "1.2.0"
+lifecycle-compose = "2.9.1"
+kotlinx-metadata-jvm = "0.9.0"
 
 [libraries]
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt-version" }
+kotlinx-metadata-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-metadata-jvm", version.ref = "kotlinx-metadata-jvm" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 androidx-lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle-compose" }
 
@@ -50,7 +53,6 @@ retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit
 xmlutil-core = { group = "io.github.pdvrieze.xmlutil", name = "core", version.ref = "xmlUtil"  }
 xmlutil-serialization = { group = "io.github.pdvrieze.xmlutil", name = "serialization", version.ref = "xmlUtil"  }
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coilVersion" }
-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt-version" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt-version" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room"}
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room"}
@@ -68,6 +70,7 @@ testng = { group = "org.testng", name = "testng", version.ref = "testng" }
 junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
 
 [plugins]
+androidx-room = { id = "androidx.room", version.ref = "room" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
