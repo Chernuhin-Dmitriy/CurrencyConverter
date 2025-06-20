@@ -10,7 +10,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -51,11 +50,11 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("currencies") {
-                            val viewModel: CurrenciesViewModel = hiltViewModel()
                             CurrenciesScreen(
-                                viewModel = viewModel,
-                                onNavigateToExchange = { fromCurrency, toCurrency, fromAmount, toAmount ->
-                                    navController.navigate("exchange/$fromCurrency/$toCurrency/$fromAmount/$toAmount")
+                                onNavigateToExchange = { fromCurrency, toCurrency, fromAmount, toAmount, exchangeRate ->
+                                    navController.navigate(
+                                        "exchange/$fromCurrency/$toCurrency/$fromAmount/$toAmount/$exchangeRate"
+                                    )
                                 },
                                 onNavigateToTransactions = {
                                     navController.navigate("transactions")
@@ -63,19 +62,19 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("exchange/{fromCurrency}/{toCurrency}/{fromAmount}/{toAmount}") { backStackEntry ->
+                        composable("exchange/{fromCurrency}/{toCurrency}/{fromAmount}/{toAmount}/{exchangeRate}") { backStackEntry ->
                             val fromCurrency = backStackEntry.arguments?.getString("fromCurrency") ?: ""
                             val toCurrency = backStackEntry.arguments?.getString("toCurrency") ?: ""
                             val fromAmount = backStackEntry.arguments?.getString("fromAmount")?.toDoubleOrNull() ?: 0.0
                             val toAmount = backStackEntry.arguments?.getString("toAmount")?.toDoubleOrNull() ?: 0.0
+                            val exchangeRate = backStackEntry.arguments?.getString("exchangeRate")?.toDoubleOrNull() ?: 0.0
 
-                            val viewModel: ExchangeViewModel = hiltViewModel()
                             ExchangeScreen(
-                                viewModel = viewModel,
                                 fromCurrency = fromCurrency,
                                 toCurrency = toCurrency,
                                 fromAmount = fromAmount,
                                 toAmount = toAmount,
+                                exchangeRate = exchangeRate,
                                 onNavigateBack = {
                                     navController.popBackStack()
                                 }
@@ -83,9 +82,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("transactions") {
-                            val viewModel: TransactionsViewModel = hiltViewModel()
                             TransactionsScreen(
-                                viewModel = viewModel,
                                 onNavigateBack = {
                                     navController.popBackStack()
                                 }

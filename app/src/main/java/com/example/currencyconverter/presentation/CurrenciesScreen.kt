@@ -14,6 +14,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -114,6 +116,7 @@ fun CurrenciesScreen(
                         CurrencyItem(
                             rate = rate,
                             isSelected = rate.currencyCode == uiState.selectedCurrency,
+                            isInputMode = uiState.isInputMode && rate.currencyCode == uiState.selectedCurrency,
                             inputAmount = if (rate.currencyCode == uiState.selectedCurrency) uiState.inputAmount else "",
                             onCurrencyClick = { viewModel.onCurrencyClick(rate.currencyCode) },
                             onAmountChanged = { viewModel.onAmountChanged(it) },
@@ -131,6 +134,7 @@ fun CurrenciesScreen(
 private fun CurrencyItem(
     rate: Rate,
     isSelected: Boolean,
+    isInputMode: Boolean,
     inputAmount: String,
     onCurrencyClick: () -> Unit,
     onAmountChanged: (String) -> Unit,
@@ -138,7 +142,14 @@ private fun CurrencyItem(
 ) {
     val context = LocalContext.current
     val currencyInfo = CurrencyUtils.getCurrencyInfo(context, rate.currencyCode)
-    val isInputMode = isSelected && inputAmount.isNotEmpty()
+    val focusRequester = remember { FocusRequester() }
+
+    // Автофокус на поле ввода при переходе в режим ввода
+    LaunchedEffect(isInputMode) {
+        if (isInputMode) {
+            focusRequester.requestFocus()
+        }
+    }
 
     Card(
         modifier = Modifier
@@ -162,18 +173,16 @@ private fun CurrencyItem(
             // Флаг валюты (заглушка)
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(50.dp)
                     .background(
-                        color = MaterialTheme.colorScheme.secondary,
+                        color = MaterialTheme.colorScheme.surfaceVariant,
                         shape = RoundedCornerShape(20.dp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = rate.currencyCode.take(2),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSecondary
+                    text = CurrencyUtils.getCurrencyFlag(rate.currencyCode),
+                    fontSize = 20.sp
                 )
             }
 
@@ -210,19 +219,28 @@ private fun CurrencyItem(
             }
 
             // Сумма и ввод
-            if (isSelected && isInputMode) {
+            if (isInputMode) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedTextField(
                         value = inputAmount,
                         onValueChange = onAmountChanged,
-                        modifier = Modifier.width(120.dp),
+                        modifier = Modifier
+                            .width(120.dp)
+                            .focusRequester(focusRequester),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         singleLine = true,
                         textStyle = MaterialTheme.typography.bodyLarge.copy(
                             textAlign = TextAlign.End
-                        )
+                        ),
+                        placeholder = {
+                            Text(
+                                text = "1",
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.End
+                            )
+                        }
                     )
 
                     IconButton(onClick = onClearAmount) {
@@ -240,12 +258,7 @@ private fun CurrencyItem(
                     Text(
                         text = CurrencyUtils.formatAmount(rate.value),
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium,
-                        modifier = if (isSelected) {
-                            Modifier.clickable { onAmountChanged("") }
-                        } else {
-                            Modifier
-                        }
+                        fontWeight = FontWeight.Medium
                     )
                     Text(
                         text = currencyInfo.symbol,

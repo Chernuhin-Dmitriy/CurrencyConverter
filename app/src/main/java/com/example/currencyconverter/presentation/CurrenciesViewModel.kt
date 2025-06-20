@@ -41,14 +41,18 @@ class CurrenciesViewModel @Inject constructor(
     fun selectCurrency(currencyCode: String) {
         _uiState.value = _uiState.value.copy(
             selectedCurrency = currencyCode,
-            inputAmount = ""
+            inputAmount = "",
+            isInputMode = false // Добавляем флаг режима ввода
         )
         startRatesUpdates()
     }
 
     fun onAmountChanged(amount: String) {
         val numericAmount = amount.toDoubleOrNull()
-        _uiState.value = _uiState.value.copy(inputAmount = amount)
+        _uiState.value = _uiState.value.copy(
+            inputAmount = amount,
+            isInputMode = true // Переходим в режим ввода при изменении суммы
+        )
 
         if (numericAmount != null && numericAmount > 0) {
             loadFilteredRates(numericAmount)
@@ -58,19 +62,24 @@ class CurrenciesViewModel @Inject constructor(
     }
 
     fun clearAmount() {
-        _uiState.value = _uiState.value.copy(inputAmount = "")
+        _uiState.value = _uiState.value.copy(
+            inputAmount = "",
+            isInputMode = false // Выходим из режима ввода
+        )
         startRatesUpdates()
     }
 
     fun onCurrencyClick(currencyCode: String) {
-        val currentAmount = _uiState.value.inputAmount.toDoubleOrNull()
-        if (currentAmount != null && currentAmount > 0) {
+        val currentState = _uiState.value
+        val currentAmount = currentState.inputAmount.toDoubleOrNull()
+
+        if (currentState.isInputMode && currentAmount != null && currentAmount > 0) {
             // Переход на экран обмена
-            val selectedRate = _uiState.value.rates.find { it.currencyCode == currencyCode }
+            val selectedRate = currentState.rates.find { it.currencyCode == currencyCode }
             selectedRate?.let { rate ->
-                _uiState.value = _uiState.value.copy(
+                _uiState.value = currentState.copy(
                     navigationEvent = NavigationEvent.ToExchange(
-                        fromCurrency = _uiState.value.selectedCurrency,
+                        fromCurrency = currentState.selectedCurrency,
                         toCurrency = currencyCode,
                         fromAmount = currentAmount,
                         toAmount = rate.value,
@@ -78,6 +87,12 @@ class CurrenciesViewModel @Inject constructor(
                     )
                 )
             }
+        } else if (currencyCode == currentState.selectedCurrency && !currentState.isInputMode) {
+            // Клик по уже выбранной валюте - переходим в режим ввода
+            _uiState.value = currentState.copy(
+                inputAmount = "1",
+                isInputMode = true
+            )
         } else {
             // Обычное переключение валюты
             selectCurrency(currencyCode)
@@ -166,6 +181,7 @@ class CurrenciesViewModel @Inject constructor(
 data class CurrenciesUiState(
     val selectedCurrency: String = "RUB",
     val inputAmount: String = "",
+    val isInputMode: Boolean = false, // Добавляем флаг режима ввода
     val rates: List<Rate> = emptyList(),
     val isLoading: Boolean = true,
     val errorMessage: String? = null,
