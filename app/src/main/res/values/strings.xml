@@ -16,7 +16,7 @@
 
     <!-- Currencies Screen -->
     <string name="clear_amount" translatable="false">Очистить сумму</string>
-    <string name="balance" translatable="false">Баланс: %s</string>
+    <string name="balance" translatable="false">Баланс: %s%s</string>
     <string name="loading" translatable="false">Загрузка...</string>
     <string name="error_loading_rates" translatable="false">Ошибка загрузки курсов</string>
 

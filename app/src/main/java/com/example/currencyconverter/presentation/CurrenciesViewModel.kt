@@ -94,13 +94,19 @@ class CurrenciesViewModel @Inject constructor(
             // Переход на экран обмена
             val selectedRate = currentState.rates.find { it.currencyCode == currencyCode }
             selectedRate?.let { rate ->
+                // Логика: пользователь ввел сумму в выбранной валюте (selectedCurrency),
+                // которую он хочет ПОЛУЧИТЬ, и кликнул на валюту, которой хочет ПЛАТИТЬ
+
+                // currentAmount - сколько хочет получить выбранной валюты
+                // rate.value - сколько нужно заплатить базовой валютой за currentAmount выбранной валюты
+
                 _uiState.value = currentState.copy(
                     navigationEvent = NavigationEvent.ToExchange(
-                        fromCurrency = currentState.selectedCurrency,
-                        toCurrency = currencyCode,
-                        fromAmount = currentAmount,
-                        toAmount = rate.value,
-                        exchangeRate = rate.value / currentAmount
+                        fromCurrency = currencyCode, // Валюта, которой платим (кликнули)
+                        toCurrency = currentState.selectedCurrency, // Валюта, которую хотим получить (вводили сумму)
+                        fromAmount = rate.value, // Сколько нужно заплатить базовой валютой
+                        toAmount = currentAmount, // Сколько хотим получить выбранной валюты
+                        exchangeRate = rate.value / currentAmount // Курс: сколько базовой валюты за 1 единицу выбранной
                     )
                 )
             }
