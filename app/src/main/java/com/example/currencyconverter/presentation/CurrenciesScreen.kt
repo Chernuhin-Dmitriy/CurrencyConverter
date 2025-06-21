@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.currencyconverter.R
+import com.example.currencyconverter.domain.model.CurrencyInfo
 import com.example.currencyconverter.domain.model.Rate
 import com.example.currencyconverter.utils.CurrencyUtils
 
@@ -210,7 +211,8 @@ private fun CurrencyItem(
                         Text(
                             text = stringResource(
                                 R.string.balance,
-                                CurrencyUtils.formatAmount(balance)
+                                CurrencyUtils.formatAmount(balance),
+                                currencyInfo.symbol
                             ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary
@@ -248,7 +250,7 @@ private fun CurrencyItem(
                         leadingIcon = {
                             // Символ валюты слева
                             Text(
-                                text = "€",
+                                text = currencyInfo.symbol,
                                 style = MaterialTheme.typography.bodyLarge.copy(
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface

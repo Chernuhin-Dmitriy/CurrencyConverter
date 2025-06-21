@@ -86,9 +86,33 @@ fun ExchangeScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                // Покупаемая валюта (сверху, зеленая)
+                // Курс обмена
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Exchange Rate",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    // Показываем правильный курс: 1 единица получаемой валюты = X единиц платежной валюты
+                    val fromInfo = CurrencyUtils.getCurrencyInfo(context, uiState.fromCurrency)
+                    val toInfo = CurrencyUtils.getCurrencyInfo(context, uiState.toCurrency)
+
+                    Text(
+                        text = "${toInfo.symbol}1 = ${fromInfo.symbol}${CurrencyUtils.formatAmount(uiState.exchangeRate)}",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Получаемая валюта (сверху, зеленая) - то, что хотим купить
                 ExchangeCurrencyCard(
                     currencyCode = uiState.toCurrency,
                     amount = uiState.toAmount,
@@ -99,7 +123,7 @@ fun ExchangeScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Продаваемая валюта (снизу, красная)
+                // Тратимая валюта (снизу, красная) - то, чем платим
                 ExchangeCurrencyCard(
                     currencyCode = uiState.fromCurrency,
                     amount = uiState.fromAmount,
@@ -111,36 +135,6 @@ fun ExchangeScreen(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-
-        // Курс обмена
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Exchange Rate",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "€1 = ₽${CurrencyUtils.formatAmount(uiState.exchangeRate)}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
 
         // Сообщение об ошибке
         uiState.errorMessage?.let { error ->
@@ -161,7 +155,7 @@ fun ExchangeScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // Кнопка покупки
+        // Кнопка покупки с динамическим текстом
         Button(
             onClick = { viewModel.performExchange() },
             modifier = Modifier
@@ -181,14 +175,19 @@ fun ExchangeScreen(
                     color = Color.White
                 )
             } else {
+                // Динамический текст кнопки
+                val toCurrencyInfo = CurrencyUtils.getCurrencyInfo(context, uiState.toCurrency)
+                val fromCurrencyInfo = CurrencyUtils.getCurrencyInfo(context, uiState.fromCurrency)
+
                 Text(
-                    text = "Buy Euro for Russia Rouble",
+                    text = "Buy ${toCurrencyInfo.name} for ${fromCurrencyInfo.name}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
                     color = Color.White
                 )
             }
         }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
