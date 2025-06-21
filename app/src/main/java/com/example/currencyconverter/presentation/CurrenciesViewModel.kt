@@ -34,7 +34,13 @@ class CurrenciesViewModel @Inject constructor(
 
     private fun initializeAccount() {
         viewModelScope.launch {
-            accountRepository.initializeDefaultAccount()
+            try {
+                accountRepository.initializeDefaultAccount()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = "Ошибка инициализации: ${e.message}"
+                )
+            }
         }
     }
 
@@ -42,29 +48,40 @@ class CurrenciesViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             selectedCurrency = currencyCode,
             inputAmount = "",
-            isInputMode = false // Добавляем флаг режима ввода
+            isInputMode = false,
+            errorMessage = null // Очищаем ошибку при смене валюты
         )
         startRatesUpdates()
     }
 
     fun onAmountChanged(amount: String) {
-        val numericAmount = amount.toDoubleOrNull()
         _uiState.value = _uiState.value.copy(
             inputAmount = amount,
-            isInputMode = true // Переходим в режим ввода при изменении суммы
+            isInputMode = true,
+            errorMessage = null // Очищаем ошибку при вводе
         )
 
-        if (numericAmount != null && numericAmount > 0) {
-            loadFilteredRates(numericAmount)
-        } else {
-            startRatesUpdates()
+        // Добавляем небольшую задержку для debounce
+        ratesUpdateJob?.cancel()
+        ratesUpdateJob = viewModelScope.launch {
+            delay(300) // Задержка 300мс для debounce
+
+            val numericAmount = amount.toDoubleOrNull()
+            if (numericAmount != null && numericAmount > 0) {
+                loadFilteredRates(numericAmount)
+            } else if (amount.isEmpty()) {
+                // Если поле пустое, показываем обычные курсы
+                startRatesUpdates()
+            }
+            // Если введено некорректное число, просто оставляем текущий список
         }
     }
 
     fun clearAmount() {
         _uiState.value = _uiState.value.copy(
             inputAmount = "",
-            isInputMode = false // Выходим из режима ввода
+            isInputMode = false,
+            errorMessage = null
         )
         startRatesUpdates()
     }
@@ -91,7 +108,8 @@ class CurrenciesViewModel @Inject constructor(
             // Клик по уже выбранной валюте - переходим в режим ввода
             _uiState.value = currentState.copy(
                 inputAmount = "1",
-                isInputMode = true
+                isInputMode = true,
+                errorMessage = null
             )
         } else {
             // Обычное переключение валюты
@@ -104,7 +122,7 @@ class CurrenciesViewModel @Inject constructor(
     }
 
     private fun startRatesUpdates() {
-        ratesUpdateJob?.cancel()
+        cancelCurrentJob()
         ratesUpdateJob = viewModelScope.launch {
             while (true) {
                 try {
@@ -125,13 +143,17 @@ class CurrenciesViewModel @Inject constructor(
 
                     _uiState.value = _uiState.value.copy(
                         rates = sortedRates,
-                        isLoading = false
+                        isLoading = false,
+                        errorMessage = null
                     )
                 } catch (e: Exception) {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = e.message
-                    )
+                    // Проверяем, что корутина не была отменена
+                    if (e !is kotlinx.coroutines.CancellationException) {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            errorMessage = "Ошибка загрузки курсов: ${e.message}"
+                        )
+                    }
                 }
                 delay(1000) // Обновляем каждую секунду согласно ТЗ
             }
@@ -139,7 +161,7 @@ class CurrenciesViewModel @Inject constructor(
     }
 
     private fun loadFilteredRates(desiredAmount: Double) {
-        ratesUpdateJob?.cancel()
+        cancelCurrentJob()
         ratesUpdateJob = viewModelScope.launch {
             while (true) {
                 try {
@@ -159,29 +181,38 @@ class CurrenciesViewModel @Inject constructor(
 
                     _uiState.value = _uiState.value.copy(
                         rates = sortedRates,
-                        isLoading = false
+                        isLoading = false,
+                        errorMessage = null
                     )
                 } catch (e: Exception) {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = e.message
-                    )
+                    // Проверяем, что корутина не была отменена
+                    if (e !is kotlinx.coroutines.CancellationException) {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            errorMessage = "Ошибка загрузки курсов: ${e.message}"
+                        )
+                    }
                 }
                 delay(1000)
             }
         }
     }
 
+    private fun cancelCurrentJob() {
+        ratesUpdateJob?.cancel()
+        ratesUpdateJob = null
+    }
+
     override fun onCleared() {
         super.onCleared()
-        ratesUpdateJob?.cancel()
+        cancelCurrentJob()
     }
 }
 
 data class CurrenciesUiState(
     val selectedCurrency: String = "RUB",
     val inputAmount: String = "",
-    val isInputMode: Boolean = false, // Добавляем флаг режима ввода
+    val isInputMode: Boolean = false,
     val rates: List<Rate> = emptyList(),
     val isLoading: Boolean = true,
     val errorMessage: String? = null,

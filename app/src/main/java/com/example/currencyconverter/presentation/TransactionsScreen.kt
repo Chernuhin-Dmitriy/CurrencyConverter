@@ -144,7 +144,7 @@ private fun TransactionItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.transaction_format, transaction.id), //transaction_title
+                    text = stringResource(R.string.transaction_title, transaction.id),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
@@ -195,7 +195,7 @@ private fun TransactionItem(
             val exchangeRate = transaction.toAmount / transaction.fromAmount
             Text(
                 text = stringResource(
-                    R.string.transaction_format,//transaction_rate,
+                    R.string.transaction_rate,
                     transaction.fromCurrency,
                     CurrencyUtils.formatAmount(exchangeRate),
                     transaction.toCurrency

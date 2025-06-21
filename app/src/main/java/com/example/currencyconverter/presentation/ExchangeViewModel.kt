@@ -30,18 +30,39 @@ class ExchangeViewModel @Inject constructor(
             toCurrency = toCurrency,
             fromAmount = fromAmount,
             toAmount = toAmount,
-            exchangeRate = exchangeRate
+            exchangeRate = exchangeRate,
+            errorMessage = null
         )
     }
 
     fun performExchange() {
         val state = _uiState.value
-        if (state.fromCurrency.isEmpty() || state.toCurrency.isEmpty()) return
 
-        _uiState.value = state.copy(isLoading = true)
+        // Валидация данных
+        if (state.fromCurrency.isEmpty() || state.toCurrency.isEmpty()) {
+            _uiState.value = state.copy(
+                errorMessage = "Некорректные данные для обмена"
+            )
+            return
+        }
+
+        if (state.fromAmount <= 0 || state.toAmount <= 0) {
+            _uiState.value = state.copy(
+                errorMessage = "Сумма обмена должна быть больше нуля"
+            )
+            return
+        }
+
+        _uiState.value = state.copy(
+            isLoading = true,
+            errorMessage = null
+        )
 
         viewModelScope.launch {
             try {
+                // Выполняем обмен валют
+                // fromAmount - сколько списываем (продаем)
+                // toAmount - сколько получаем (покупаем)
                 exchangeCurrencyUseCase(
                     fromCurrency = state.fromCurrency,
                     toCurrency = state.toCurrency,
@@ -51,19 +72,25 @@ class ExchangeViewModel @Inject constructor(
 
                 _uiState.value = state.copy(
                     isLoading = false,
-                    exchangeCompleted = true
+                    exchangeCompleted = true,
+                    errorMessage = null
                 )
+
             } catch (e: Exception) {
                 _uiState.value = state.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Ошибка при обмене валют"
+                    errorMessage = e.message ?: "Ошибка при обмене валют",
+                    exchangeCompleted = false
                 )
             }
         }
     }
 
     fun onExchangeCompletedConsumed() {
-        _uiState.value = _uiState.value.copy(exchangeCompleted = false)
+        _uiState.value = _uiState.value.copy(
+            exchangeCompleted = false,
+            errorMessage = null
+        )
     }
 }
 
