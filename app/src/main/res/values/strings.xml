@@ -32,6 +32,8 @@
     <string name="no_transactions" translatable="false">Нет транзакций</string>
     <string name="transaction_format" translatable="false">%1$s → %2$s</string>
     <string name="amount_format" translatable="false">%1$s %2$s → %3$s %4$s</string>
+    <string name="transaction_title" translatable="false">Транзакция #%1$d</string>
+    <string name="transaction_rate" translatable="false">1 %1$s = %2$s %3$s</string>
 
 
     <string name="symbol_eur" translatable="false">€</string>

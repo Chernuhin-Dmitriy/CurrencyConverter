@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -223,47 +224,71 @@ private fun CurrencyItem(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedTextField(
+                    TextField(
                         value = inputAmount,
                         onValueChange = onAmountChanged,
                         modifier = Modifier
-                            .width(120.dp)
+                            .width(150.dp) // Увеличена ширина для размещения валюты
                             .focusRequester(focusRequester),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         singleLine = true,
                         textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            textAlign = TextAlign.End
+                            textAlign = TextAlign.End,
+                            fontWeight = FontWeight.Bold // Жирный шрифт для суммы
                         ),
                         placeholder = {
                             Text(
-                                text = "1",
-                                style = MaterialTheme.typography.bodyLarge,
+                                text = "150,00",
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
                                 textAlign = TextAlign.End
                             )
-                        }
-                    )
-
-                    IconButton(onClick = onClearAmount) {
-                        Icon(
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = stringResource(R.string.clear_amount)
+                        },
+                        leadingIcon = {
+                            // Символ валюты слева
+                            Text(
+                                text = "€",
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            )
+                        },
+                        trailingIcon = {
+                            // Крестик для очистки справа
+                            IconButton(
+                                onClick = onClearAmount,
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = stringResource(R.string.clear_amount),
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        },
+                        colors = TextFieldDefaults.colors(
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent
                         )
-                    }
+                    )
                 }
             } else {
                 // Обычное отображение суммы
-                Column(
-                    horizontalAlignment = Alignment.End
+                Row(
+//                    horizontalAlignment = Alignment.End
                 ) {
+                    Text(
+                        text = currencyInfo.symbol,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                     Text(
                         text = CurrencyUtils.formatAmount(rate.value),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = currencyInfo.symbol,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
